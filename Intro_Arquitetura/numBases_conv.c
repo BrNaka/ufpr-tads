@@ -1,7 +1,8 @@
-
+// CALCULADORA CONVERSORA DE BASES NÚMERICAS IMPLEMENTADA EM C
 // ALUNO        :       Bruno Nakayabu
 // DATA         :       01/05/2018
 // COMENTÁRIOS  :       Programa criado como trabalho para a disciplina "Introdução à Arquitetura de Computadores" da UFPR.
+//              :       Caso esteja usando Linux, compilar com: 'gcc numBases_conv.c -o numBases_conv -lm'.
 // OBS          :       Alguns bugs existem. Ao escolher a opção de transformar um número na base 2, 8 ou 16, a calculadora não acusa
 //              :       erro, caso o usuário digite um número maior do que o algarismo máximo representativo da base. Ex: Converter '121'
 //              :       na base binária para decimal. BUG: O número 2 não é visto como erro pela calculadora!
