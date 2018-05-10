@@ -1,0 +1,33 @@
+// FUP que leia três números e mostre-os em ordem crescente
+
+Program Exercicio3;
+
+var
+  n1, n2, n3 : integer;
+
+BEGIN
+
+  // Recebe os valores dos três números a serem ordenados
+    write('Diga o valor do número 1: ');
+    readln(n1);
+
+    write('Diga o valor do número 2: ');
+    readln(n2);
+
+    write('Diga o valor do número 3: ');
+    readln(n3);
+
+  // Comparações lógicas para determianr a ordem crescente de três números
+    if((n1 < n2) and (n1 < n3) and (n2 < n3)) then
+      writeln('Ordem crescente: ', n1, ' ', n2, ' ', n3)
+    else if((n1 < n2) and (n1 < n3) and (n2 > n3)) then
+      writeln('Ordem crescente: ', n1, ' ', n3, ' ', n2)
+    else if((n1 > n2) and (n1 < n3) and (n2 < n3)) then
+      writeln('Ordem crescente: ', n2, ' ', n1, ' ', n3)
+    else if((n1 > n2) and (n1 > n3) and (n2 < n3)) then
+      writeln('Ordem crescente: ', n2, ' ', n2, ' ', n1)
+    else if((n1 > n2) and (n1 > n3) and (n2 > n3)) then
+      writeln('Ordem crescente: ', n3, ' ', n2, ' ', n1)
+    else
+      writeln('Ordem crescente: ', n3, ' ', n1, ' ', n2);
+END.
