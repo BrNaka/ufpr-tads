@@ -81,6 +81,35 @@ void baseToDec(char* num_base, int base) {
     printf("DECIMAL: %d\n", dec);
 }
 
+void avalia_num(char* num_base, int base) {
+    int len = 0, num; 
+
+    while(num_base[len] != '\0') {
+        if(base == 16) {
+            switch(num_base[len]) {
+                case 'A' : num = 10; break;
+                case 'a' : num = 10; break;
+                case 'B' : num = 11; break;
+                case 'b' : num = 11; break;
+                case 'C' : num = 12; break;
+                case 'c' : num = 12; break;
+                case 'D' : num = 13; break;
+                case 'd' : num = 13; break;
+                case 'E' : num = 14; break;
+                case 'e' : num = 14; break;
+                case 'F' : num = 15; break;
+                case 'f' : num = 15; break;
+                default : num = (int)num_base[len] - (int)'0';
+            }
+        }
+        if(num > (base-1) || num < 0) {
+            printf("Você informou um número inválido!\n");
+            exit(0);
+        }
+        len++;
+    }
+}
+
 // Função que imprime o menu da calculadora
 void menu(void) {
     printf("\n===========================================================\n");
@@ -106,7 +135,8 @@ void process_calc(int opt) {
             exit(0);
         case 1 : 
             printf("BINÁRIO: ");
-            scanf("%s", str); 
+            scanf("%s", str);
+            avalia_num(str, 2); 
             baseToDec(str, 2);
             break;
         case 2 : 
@@ -117,6 +147,7 @@ void process_calc(int opt) {
         case 3 : 
             printf("OCTAL = ");
             scanf("%s", str);
+            avalia_num(str, 8);
             baseToDec(str, 8);
             break;
         case 4 : 
@@ -127,6 +158,7 @@ void process_calc(int opt) {
         case 5 : 
             printf("HEXADECIMAL = ");
             scanf("%s", str);
+            avalia_num(str, 16);
             baseToDec(str, 16);
             break;
         case 6 : 
