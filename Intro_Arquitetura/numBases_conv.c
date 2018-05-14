@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define SIZE 255
 #define ALG 17
@@ -57,24 +58,13 @@ void baseToDec(char* num_base, int base) {
     // e somado ao valor da variável 'dec', que recebe as somas sucessivas. 
     for(exp, indx=(len-1); exp < len; exp++, indx--) {
         if(base == 16) {
-            switch(num_base[indx]) {
-                case 'A' : num = 10; break;
-                case 'a' : num = 10; break;
-                case 'B' : num = 11; break;
-                case 'b' : num = 11; break;
-                case 'C' : num = 12; break;
-                case 'c' : num = 12; break;
-                case 'D' : num = 13; break;
-                case 'd' : num = 13; break;
-                case 'E' : num = 14; break;
-                case 'e' : num = 14; break;
-                case 'F' : num = 15; break;
-                case 'f' : num = 15; break;
-                default : num = (int)num_base[indx] - (int)'0';
-            }
+            if(tolower(num_base[indx]) >= 'a' && tolower(num_base[indx]) <= 'f')
+                num = tolower(num_base[indx]) - 87;
+            else
+                num = (int)num_base[indx] - (int)'0';
         }
-        else
-            num = (int)num_base[indx] - (int)'0';
+            else
+                num = (int)num_base[indx] - (int)'0';
 
         // Aqui avalia se o usuário digitou um número válido ou não!
         if(num > (base-1) || num < 0) {

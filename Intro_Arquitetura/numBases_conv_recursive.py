@@ -12,16 +12,21 @@ def baseToDec(n, base, exp):
         return int(n[len(n) - 1]) * (base**(exp-1))
     return baseToDec(n[:-1], 2, exp) + int(n[len(n) - 1]) * (base**(exp-1))
 
+def menu_calc():
+    print('QUAL OPERAÇÃO DESEJA REALIZAR? ')
+    print('[ 1 ] DECIMAL        ->          BINÁRIO')
+    print('[ 2 ] BINÁRIO        ->          DECIMAL')
+    print('[ 3 ] DECIMAL        ->          OCTAL')
+    print('[ 4 ] OCTAL          ->          DECIMAL')
+    print('[ 5 ] HEXADECIMAL    ->          DECIMAL')
+    print('[ 6 ] DECIMAL        ->          HEXADECIMAL')
+    print('[ 0 ] SAIR')
+
+    option = input('ESCOLHA A OPÇÃO: ')
+    return option 
+
 
 def main():
-    d = int(input('DECIMAL PARA SER CONVERTIDO: '))
-    b = int(input('QUAL BASE DESEJA CONVERTER?: ')) 
-    a = input('INFORME UM NÚMERO EM QUALQUER BASE: ')
-    c = int(input('QUAL A BASE DO NÚMERO ANTERIOR?: '))
-    x = decToBase(d, b)
-    y = baseToDec(a, b, 0)
-    print("DECIMAL CONVERTIDO = {}".format(x))
-    print("BASE CONVERTIDA PARA DECIMAL = {}".format(y))
 
 if __name__ == "__main__":
     main()
