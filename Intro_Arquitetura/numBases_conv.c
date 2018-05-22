@@ -3,6 +3,9 @@
 // DATA         :       01/05/2018
 // COMENTÁRIOS  :       Programa criado como trabalho para a disciplina "Introdução à Arquitetura de Computadores" da UFPR.
 //              :       Caso esteja usando Linux, compilar com: 'gcc numBases_conv.c -o numBases_conv -lm'.
+//
+//              ACRESCENTEI OS COMENTÁRIOS NA BRANCH testeBranch2
+//
 
 #include <stdio.h>
 #include <math.h>
