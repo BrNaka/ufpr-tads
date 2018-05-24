@@ -58,11 +58,11 @@ char* somador(char* A, char* B, char* SUM) {
     b_numSize = strlen(B); 
 
     indxSum = iSumCon = 0;
-    indx = a_numSize - 1; 
+    indx = a_numSize-1; 
 
     for(indxSum, indx; indxSum < a_numSize; indxSum++, indx--) {
         // Meio Somador
-        if(indx == a_numSize - 1) {
+        if(indx == a_numSize-1) {
             saida[indxSum] = XOR(A[indx], B[indx]); 
             carryOut = AND(A[indx], B[indx]);
         }
@@ -73,10 +73,7 @@ char* somador(char* A, char* B, char* SUM) {
         }
     }
 
-    if(carryOut == '1')
-        saida[indxSum] = carryOut;
-    else
-        saida[indxSum] = '0';
+    saida[indxSum] = carryOut;
 
     for(indxSum, iSumCon; indxSum >= 0; indxSum--, iSumCon++) {
         SUM[iSumCon] = saida[indxSum];
