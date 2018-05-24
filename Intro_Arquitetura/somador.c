@@ -84,6 +84,7 @@ char* somador(char* A, char* B, char* SUM) {
     return SUM;
 
 }
+
 int main(void) {
     
     char A[SIZE], B[SIZE], SUM[SIZE];
