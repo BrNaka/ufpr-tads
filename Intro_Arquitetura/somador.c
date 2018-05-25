@@ -85,6 +85,20 @@ char* somador(char* A, char* B, char* SUM) {
 
 }
 
+void somador_graph() {
+    printf("%16c %c\n",'A', 'B');
+    for(int i=0; i < 5; i++) {
+        if(i == 2)
+            printf("%16s %c\n", "__:", ':'); 
+        else if(i == 3)
+            printf("%16s%s\n", "--- AND ===", "=:");
+        else
+            printf("%16c %c\n", ':', ':');
+    }
+    printf("%16c %c\n", '\\', '/');
+    printf("%18s\n %16c\n\n", "XOR", '|');
+}
+
 int main(void) {
     
     char A[SIZE], B[SIZE], SUM[SIZE];
@@ -99,6 +113,8 @@ int main(void) {
     printf("%3c%13s%10d\n", 'A', A, baseToDec(A,2));
     printf("%3c%13s%10d\n", 'B', B, baseToDec(B,2));
     printf("\n Soma%11s%10d\n\n", somador(A, B, SUM), baseToDec(somador(A, B, SUM), 2));
+
+    somador_graph();
 
     return 0;
 
