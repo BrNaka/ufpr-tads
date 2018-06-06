@@ -101,6 +101,7 @@ BEGIN
       END;
     valdat:=dat;
   END;
+
 //-----pequisa binaria
 
 PROCEDURE pebin1(vet:vetor;ext:a36;t:integer;VAR CC:INTEGER);
@@ -112,7 +113,7 @@ begin
  i9:=t;
  repeat
   meio:=(ii+i9) div 2;
-  if(ext = vet[meio].c_chave)then
+  if(ext = vet[meio].c_chave) then
 	  achou:=true
   else
    if(ext > vet[meio].c_chave)then
