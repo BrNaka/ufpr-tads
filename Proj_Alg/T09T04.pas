@@ -81,7 +81,6 @@ BEGIN
         end;
 
     ordem(candNUM, posFIS);
-
     op := option();
 
     case op of
@@ -175,6 +174,8 @@ BEGIN
             seek(candIND, candNUM[x].pf);
             write(candIND, reg);
         end;
+
+        writeln('lidos = ', beg);
 
         writeln;
         writeln;
