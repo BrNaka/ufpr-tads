@@ -1,5 +1,5 @@
 ; ESCREVA UM PROGRAMA ASSEMBLY QUE LEIA UM NÚMERO INTEIRO
-; DE 0 ATÉ 9 E IMPRIMA SEU VALOR NA TELA.
+; DE 0 ATÉ 99 E IMPRIMA SEU VALOR NA TELA.
 include emu8086.inc                      
 .model small
 .stack 100h
