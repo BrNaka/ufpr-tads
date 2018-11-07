@@ -6,9 +6,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #define TRUE 1
+#define BUFF 255
 
 /* Variável global */
     char tab[3][3];
@@ -17,16 +19,18 @@
     int jogada_usuario(int, int, char);
     void jogada_computador(char, int);
     int menu();
-    void escolha_simb(char*, char*, int);
+    void escolha_simb(char*, char*, char*, char*, int);
     void inicializa_velha();
     int verifica_ganhador(char);
+    void registra_jogadores(char*, char, char*, char);
 
 /* Funções Criadas */
     void mostra_tabuleiro();
     void imprime_rodada(int*, int);
-    void imprime_ganhador(int, char);
+    int imprime_ganhador(int, char, char*);
     void turno(char*, char, int*, int*);
     void verifica_empate(int);
+    void escolhe_nome(char*, char*, int);
     void stop();
     int basico(char);
     int intermediario(char);
@@ -34,51 +38,68 @@
     int jogada(char, int, char, char);
 
 void main() {
-    int opcao, nivel, rodada = 0;
-    char p1, p2;
+    int opcao, nivel, rodada = 0, op;
+    char p1[BUFF], p2[BUFF];
+    char s1, s2; // Símbolo player1 (s1) e Símbolo player2 (s2)
     int lin, col;
     
     opcao = menu();
-    inicializa_velha();
 
     /* Player x Player */
     if (opcao == 2) {
-        escolha_simb(&p1, &p2, opcao);
-        while (TRUE) { 
-            imprime_rodada(&rodada, 0);
-            mostra_tabuleiro();
-            turno("Player 1", p1, &lin, &col);
-            opcao = verifica_ganhador(p1);
-            imprime_ganhador(opcao, p1);
+        escolhe_nome(p1, p2, opcao);
+        escolha_simb(p1, p2, &s1, &s2, opcao);
+        registra_jogadores(p1, s1, p2, s2);
+        while (TRUE) {
+            inicializa_velha();
+            while (TRUE) { 
+                imprime_rodada(&rodada, 0);
+                mostra_tabuleiro();
+                turno(p1, s1, &lin, &col);
+                opcao = verifica_ganhador(s1);
+                if (imprime_ganhador(opcao, s1, p1)) break;
 
-            verifica_empate(rodada);
+                verifica_empate(rodada);
 
-            imprime_rodada(&rodada, 0);
-            mostra_tabuleiro();
-            turno("Player 2", p2, &lin, &col);
-            opcao = verifica_ganhador(p2);
-            imprime_ganhador(opcao, p2);
+                imprime_rodada(&rodada, 0);
+                mostra_tabuleiro();
+                turno(p2, s2, &lin, &col);
+                opcao = verifica_ganhador(s2);
+                if(imprime_ganhador(opcao, s2, p2)) break;
+            }
+            printf("Deseja jogar novamente?\n[1] SIM\n[2] NÃO\n");
+            scanf("%d", &op);
+            if (op == 2) exit(0);  
+            rodada = 0;
         }
     }
 
     /* Player x Computador */
     if (opcao != 2) {
         nivel = opcao;
-        escolha_simb(&p1, &p2, opcao);
-        while (TRUE) {
-            imprime_rodada(&rodada, nivel);
-            mostra_tabuleiro();
-            nivel == 5 ? jogada_computador(p1, nivel) : turno("Player 1", p1, &lin, &col);
-            opcao = verifica_ganhador(p1);
-            imprime_ganhador(opcao, p1);
+        escolhe_nome(p1, p2, opcao);
+        escolha_simb(p1, p2, &s1, &s2, opcao);
+        while (TRUE) { 
+            inicializa_velha();
+            while (TRUE) {
+                imprime_rodada(&rodada, nivel);
+                mostra_tabuleiro();
+                nivel == 5 ? jogada_computador(s1, nivel) : turno(p1, s1, &lin, &col);
+                opcao = verifica_ganhador(s1);
+                if (imprime_ganhador(opcao, s1, p1)) break;
 
-            verifica_empate(rodada);
+                verifica_empate(rodada);
 
-            imprime_rodada(&rodada, nivel);
-            mostra_tabuleiro();
-            nivel == 5 ? turno("Player", p2, &lin, &col) : jogada_computador(p2, nivel);
-            opcao = verifica_ganhador(p2);
-            imprime_ganhador(opcao, p2);
+                imprime_rodada(&rodada, nivel);
+                mostra_tabuleiro();
+                nivel == 5 ? turno(p1, s2, &lin, &col) : jogada_computador(s2, nivel);
+                opcao = verifica_ganhador(s2);
+                if(imprime_ganhador(opcao, s2, p2)) break;
+            }
+            printf("Deseja jogar novamente?\n[1] SIM\n[2] NÃO\n");
+            scanf("%d", &op);
+            if (op == 2) exit(0);  
+            rodada = 0;
         }
     }
 }
@@ -103,6 +124,7 @@ int menu() {
 
         printf("Opção: ");
         scanf("%d", &op);
+        setbuf(stdin, NULL);
 
         if ((op >= 3) && (op <= 5)) return op;
         printf("ERRO: Opção [%d] inválida!!!", op); 
@@ -138,18 +160,41 @@ void mostra_tabuleiro() {
     }
 }
 
-void escolha_simb(char* p1, char* p2, int op) {
-    printf("____________________________________________");
-    op == 2 ? printf("\n____________ PLAYER X PLAYER  ______________\n\n") : printf("\n___________ PLAYER X COMPUTADOR  ___________\n\n");
+void escolhe_nome(char* player1, char* player2, int op) {
+    int len = 0;
+
+    system("clear");
+
+    printf("Nome do Jogador 1: ");
+    fgets(player1, BUFF, stdin);
+    len = strlen(player1);
+    player1[len-1] = '\0';
+    setbuf(stdin, NULL);
+    
+    if (op == 2) { 
+        printf("Nome do Jogador 2: ");
+        fgets(player2, BUFF, stdin);
+        len = strlen(player2);
+        player2[len-1] = '\0';
+        setbuf(stdin, NULL);
+    } else {
+        player2 = "Computador";
+    }
+
+}
+
+void escolha_simb(char* p1, char* p2, char* s1, char* s2, int op) {
+    system("clear");
+    op == 2 ? printf("\n======== %s X %s =========\n\n", p1, p2) : printf("\n___________ %s X COMPUTADOR  ___________\n\n", p1);
     printf("Escolha um símbolo ('X' ou 'O')\n");
     do {
-        printf("    JOGADOR 1: ");
-        scanf(" %c%*c", p1);
-    } while((*p1 != 'X') && (*p1 != 'O'));
-    *p2 = *p1 == 'X' ? 'O' : 'X';
+        printf("    %s: ", p1);
+        scanf(" %c%*c", s1);
+    } while((*s1 != 'X') && (*s1 != 'O'));
+    *s2 = *s1 == 'X' ? 'O' : 'X';
     printf("\nSímbolo dos Jogadores: \n");
-    printf("    Jogador 1 ---> %c\n", *p1);
-    op == 2 ? printf("    Jogador 2 ---> %c\n", *p2) : printf("    Computador ---> %c\n", *p2);
+    printf("    %s ---> %c\n", p1, *s1);
+    op == 2 ? printf("    %s ---> %c\n", p2, *s2) : printf("    Computador ---> %c\n", *s2);
     stop();
 }
 
@@ -183,14 +228,15 @@ int verifica_ganhador(char jog) {
     return 0;
 }
 
-void imprime_ganhador(int op, char jog) {
+int imprime_ganhador(int op, char jog, char* nome) {
     if (op == 1) { 
         system("clear");
-        printf("\n======== JOGADOR %c VENCEU!!! ======== \n\n", jog);
+        printf("\n======== %s %c VENCEU!!! ======== \n\n", nome, jog);
         mostra_tabuleiro();
         stop();
-        exit(0);
+        return 1;
     }
+    return 0;
 }
 
 void turno(char* player, char jog, int* lin, int* col) {
@@ -405,6 +451,20 @@ int avancado(char jog) {
        }
    }
    return 0;
+}
+
+void registra_jogadores(char* p1, char s1, char* p2, char s2) {
+    FILE* arq;
+
+    if ((arq = fopen("nomes_jogadores.txt", "w+")) == NULL) {
+        printf("O arquivo não pode ser aberto!\n");
+        exit(0);
+    }
+
+    fprintf(arq, "Jogador 1: %s\nSímbolo: %c\n\n", p1, s1);
+    fprintf(arq, "Jogador 2: %s\nSímbolo: %c\n\n", p2, s2);
+
+    fclose(arq);
 }
 
 void stop() {
