@@ -20,6 +20,10 @@
         int partida;
         char JogVelha[3][3];
         char resultado;
+        char player1[BUFF];
+        char sinal1;
+        char player2[BUFF];
+        char sinal2;
     } Partida;
 
 /* Funções Obrigatórias */
@@ -29,9 +33,10 @@
     void escolha_simb(char*, char*, char*, char*, int);
     void inicializa_velha();
     int verifica_ganhador(char);
-    void registra_jogadores(char*, char, char*, char);
+    void registra_jogadores(char*, char, char*, char, Partida*);
     int grava_resultado(char*, Partida*);
     void readFile(char*, int);
+    void mostra_partidas(char*);
 
 /* Funções Criadas */
     void tabuleiro();
@@ -62,9 +67,9 @@ void main() {
     /* Player x Player */
     if (opcao == 2) {
         escolhe_nome(p1, p2, opcao);
-        cria_nome_arquivo(arqName, p1, p2);
         escolha_simb(p1, p2, &s1, &s2, opcao);
-        registra_jogadores(p1, s1, p2, s2);
+        cria_nome_arquivo(arqName, p1, p2);
+        registra_jogadores(p1, s1, p2, s2, &jogo);
         while (TRUE) {
             inicializa_velha();
             while (TRUE) { 
@@ -493,8 +498,13 @@ int avancado(char jog) {
    return 0;
 }
 
-void registra_jogadores(char* p1, char s1, char* p2, char s2) {
+void registra_jogadores(char* p1, char s1, char* p2, char s2, Partida* jogo) {
     FILE* arq;
+
+    strcpy(jogo->player1, p1);
+    strcpy(jogo->player2, p2);
+    jogo->sinal1 = s1;
+    jogo->sinal2 = s2;
 
     if ((arq = fopen("nomes_jogadores.txt", "w+")) == NULL) {
         printf("O arquivo não pode ser aberto!\n");
@@ -559,8 +569,8 @@ int resultado(char* filename) {
         printf("\n ==== RESULTADO DO CAMPEONATO  ===\n[1] Escolha uma partida\n[2] Todas as partidas\n[0] SAIR\n    Opção: ");
         scanf("%d", &op);
         switch(op) {
-            case 1: printf("\nDigite o número da partida: "); scanf("%d", &partida); system("clear"); readFile(filename, partida); break;
-            case 2: printf("Opção 2"); break;
+            case 1: readFile(filename, partida); break;
+            case 2: mostra_partidas(filename); stop(); break;
             case 0: exit(0);
             default: printf("Opção [%d] inválida!!!\n", op);    
         }
@@ -576,8 +586,18 @@ void readFile(char* filename, int partida) {
         printf("ERRO ao abrir o arquivo!\n");
         exit(0);
     }
-    fseek(f, sizeof(Partida)*pos, SEEK_SET);
-    fread(&buffer, sizeof(Partida), 1, f);
+
+    while (TRUE) {
+        printf("\nDigite o número da partida: ");
+        scanf("%d", &partida);
+        system("clear");
+  
+        pos = partida-1;
+        fseek(f, sizeof(Partida) * pos, SEEK_SET);
+        if (fread(&buffer, sizeof(Partida), 1, f)) break;
+        printf("Partida %d não existe!", partida);
+    }
+
     printf("\nPartida = %d\n", buffer.partida);
     printf("________________________\n\n");
     printf("Tabuleiro\n\n");
@@ -587,8 +607,46 @@ void readFile(char* filename, int partida) {
         lin == 2 ? printf("\n\n") : printf("\n--- --- ---\n"); 
     }
     printf("________________________\n");
-    printf("\nGanhador: *- %c -*\n", buffer.resultado);
+    buffer.resultado == buffer.sinal1 ? printf("\nGanhador: %s *- %c -*\n", buffer.player1, buffer.resultado) : printf("\nGanhador: %s *- %c -*\n", buffer.player2, buffer.resultado);
     stop();
+    fclose(f);
+}
+
+void mostra_partidas(char* filename) {
+    FILE *f;
+    Partida buffer;
+    int lin, col, p1 = 0, p2 = 0;
+
+    if ((f = fopen(filename, "rb")) == NULL) {
+        printf("ERRO ao abrir o arquivo\n");
+        exit(0);
+    }
+
+    while (fread(&buffer, sizeof(Partida), 1, f) != 0) {
+        printf("\n======= Partida %d | Vencedor '%c' =======\n\n", buffer.partida, buffer.resultado);
+        for (lin = 0; lin < 3; lin++) {
+            for (col = 0; col < 3; col++)
+                col == 2 ? printf(" %c ", buffer.JogVelha[lin][col]) : printf(" %c |", buffer.JogVelha[lin][col]);
+            lin == 2 ? printf("\n\n") : printf("\n--- --- ---\n"); 
+        }
+        printf("\n");
+        buffer.resultado == buffer.sinal1 ? ++p1 : ++p2;
+    }
+
+    printf("\n=========== Placar =============\n\n%s ('%c') ---> %d\n%s ('%c') ---> %d\n\n", buffer.player1, buffer.sinal1, p1, buffer.player2, buffer.sinal2, p2);
+    if (p1 > p2) { 
+        printf("    ======================\n");
+        printf("        %s Campeã(o)     \n", buffer.player1);
+        printf("    ======================\n");
+    } else if (p2 > p1) {
+        printf("    ======================\n");
+        printf("        %s Campeã(o)     \n", buffer.player2);
+        printf("    ======================\n");
+    } else {
+        printf("    ======================\n");
+        printf("             Empate     \n");
+        printf("    ======================\n");
+    }
     fclose(f);
 }
 
