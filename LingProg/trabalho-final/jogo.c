@@ -15,6 +15,13 @@
 /* Variável global */
     char tab[3][3];
 
+/* Definição da Struct */
+    typedef struct Velha {
+        int partida;
+        char JogVelha[3][3];
+        char resultado;
+    } Partida;
+
 /* Funções Obrigatórias */
     int jogada_usuario(int, int, char);
     void jogada_computador(char, int);
@@ -23,54 +30,77 @@
     void inicializa_velha();
     int verifica_ganhador(char);
     void registra_jogadores(char*, char, char*, char);
+    int grava_resultado(char*, Partida*);
+    void readFile(char*, int);
 
 /* Funções Criadas */
-    void mostra_tabuleiro();
+    void tabuleiro();
     void imprime_rodada(int*, int);
-    int imprime_ganhador(int, char, char*);
+    int ganhador(int, char, char*);
     void turno(char*, char, int*, int*);
-    void verifica_empate(int);
+    int empate(int);
     void escolhe_nome(char*, char*, int);
     void stop();
     int basico(char);
     int intermediario(char);
     int avancado(char);
     int jogada(char, int, char, char);
+    void cria_nome_arquivo(char*, char*, char*);
+    void guarda_tabuleiro(Partida*);
+    int nova_partida();
+    int resultado(char*);
 
 void main() {
-    int opcao, nivel, rodada = 0, op;
-    char p1[BUFF], p2[BUFF];
+    int opcao, nivel, rodada = 0, partida = 1, op;
+    char p1[BUFF], p2[BUFF], arqName[BUFF];
     char s1, s2; // Símbolo player1 (s1) e Símbolo player2 (s2)
     int lin, col;
+    Partida jogo;
     
     opcao = menu();
 
     /* Player x Player */
     if (opcao == 2) {
         escolhe_nome(p1, p2, opcao);
+        cria_nome_arquivo(arqName, p1, p2);
         escolha_simb(p1, p2, &s1, &s2, opcao);
         registra_jogadores(p1, s1, p2, s2);
         while (TRUE) {
             inicializa_velha();
             while (TRUE) { 
                 imprime_rodada(&rodada, 0);
-                mostra_tabuleiro();
+                tabuleiro();
                 turno(p1, s1, &lin, &col);
                 opcao = verifica_ganhador(s1);
-                if (imprime_ganhador(opcao, s1, p1)) break;
+                if (ganhador(opcao, s1, p1)) { 
+                    jogo.resultado = s1;
+                    break;
+                }
 
-                verifica_empate(rodada);
+                if (empate(rodada)) {
+                    jogo.resultado = 'V';
+                    break;
+                }
 
                 imprime_rodada(&rodada, 0);
-                mostra_tabuleiro();
+                tabuleiro();
                 turno(p2, s2, &lin, &col);
                 opcao = verifica_ganhador(s2);
-                if(imprime_ganhador(opcao, s2, p2)) break;
+                if(ganhador(opcao, s2, p2)) { 
+                    jogo.resultado = s2;
+                    break;
+                }
             }
-            printf("Deseja jogar novamente?\n[1] SIM\n[2] NÃO\n");
-            scanf("%d", &op);
-            if (op == 2) exit(0);  
-            rodada = 0;
+            jogo.partida = partida;
+            guarda_tabuleiro(&jogo);
+            grava_resultado(arqName, &jogo);
+            if (nova_partida()) {
+                partida++; 
+                rodada = 0;
+            } else {
+                resultado(arqName);
+                exit(0);    
+            }
         }
     }
 
@@ -83,23 +113,32 @@ void main() {
             inicializa_velha();
             while (TRUE) {
                 imprime_rodada(&rodada, nivel);
-                mostra_tabuleiro();
+                tabuleiro();
                 nivel == 5 ? jogada_computador(s1, nivel) : turno(p1, s1, &lin, &col);
                 opcao = verifica_ganhador(s1);
-                if (imprime_ganhador(opcao, s1, p1)) break;
+                if (ganhador(opcao, s1, p1)) break;
 
-                verifica_empate(rodada);
+                if (empate(rodada)) break;
 
                 imprime_rodada(&rodada, nivel);
-                mostra_tabuleiro();
+                tabuleiro();
                 nivel == 5 ? turno(p1, s2, &lin, &col) : jogada_computador(s2, nivel);
                 opcao = verifica_ganhador(s2);
-                if(imprime_ganhador(opcao, s2, p2)) break;
+                if(ganhador(opcao, s2, p2)) break;
             }
-            printf("Deseja jogar novamente?\n[1] SIM\n[2] NÃO\n");
-            scanf("%d", &op);
-            if (op == 2) exit(0);  
-            rodada = 0;
+            if (nova_partida()) {
+                while (TRUE) {
+                    printf("Novo nível?\n\n[3] Básico\n[4] Intermediário\n[5] Avançado\n\n   Opção: ");
+                    scanf("%d", &nivel);
+                    if ((nivel >= 3) && (nivel <= 5)) break;
+                    printf("\nOpção [%d] inválida!!! Tente novamente!\n\n", nivel);
+                }
+                opcao = nivel;
+                rodada = 0;
+            }
+            else { 
+                exit(0);
+            }    
         }
     }
 }
@@ -151,7 +190,7 @@ void imprime_rodada(int* rodada, int nivel) {
     }
 }
 
-void mostra_tabuleiro() {
+void tabuleiro() {
     int lin, col;
     for (lin = 0; lin < 3; lin++) {
         for (col = 0; col < 3; col++)
@@ -228,11 +267,11 @@ int verifica_ganhador(char jog) {
     return 0;
 }
 
-int imprime_ganhador(int op, char jog, char* nome) {
+int ganhador(int op, char jog, char* nome) {
     if (op == 1) { 
         system("clear");
         printf("\n======== %s %c VENCEU!!! ======== \n\n", nome, jog);
-        mostra_tabuleiro();
+        tabuleiro();
         stop();
         return 1;
     }
@@ -250,14 +289,15 @@ void turno(char* player, char jog, int* lin, int* col) {
     } while (op != 0); 
 }
 
-void verifica_empate(int rodada) {
+int empate(int rodada) {
     if (rodada == 9) {
         system("clear");
         printf("========= EMPATE =========\n\n");
-        mostra_tabuleiro();
+        tabuleiro();
         stop();
-        exit(0);
+        return 1;
     }
+    return 0;
 }
 
 void jogada_computador(char jog, int nivel) {
@@ -467,7 +507,93 @@ void registra_jogadores(char* p1, char s1, char* p2, char s2) {
     fclose(arq);
 }
 
+void cria_nome_arquivo(char* name, char* p1, char* p2) {
+    strcat(name, p1);
+    strcat(name, "_x_");
+    strcat(name, p2);
+    strcat(name, ".dat");
+} 
+
+int grava_resultado(char* nom_arq, Partida* Resultado) {
+    FILE* arq;
+    int partidas = Resultado->partida;
+
+    if ((arq = fopen(nom_arq, "a+b")) == NULL ) {
+        printf("O arquivo não pode ser aberto!");
+        exit(0);
+    }
+    
+    if (fwrite(Resultado, 1, sizeof(Partida), arq) != partidas) {
+        fclose(arq); 
+        return 0;
+    }
+
+    fclose(arq);
+    return 1;
+}
+
+void guarda_tabuleiro(Partida* jogo) {
+    int lin, col;
+    for (lin = 0; lin < 3; lin++) {
+        for (col = 0; col < 3; col++) {
+            jogo->JogVelha[lin][col] = tab[lin][col];
+        }
+    }
+}
+
+int nova_partida() {
+    int op;
+    do {               
+        printf("Deseja jogar novamente?\n[1] SIM\n[2] NÃO\n");
+        scanf("%d", &op);
+    } while ((op != 1) && (op != 2)); 
+
+    if (op == 2) return 0;
+
+    return 1;
+}
+
+int resultado(char* filename) {
+    int op, partida;
+    while (TRUE) {
+        printf("\n ==== RESULTADO DO CAMPEONATO  ===\n[1] Escolha uma partida\n[2] Todas as partidas\n[0] SAIR\n    Opção: ");
+        scanf("%d", &op);
+        switch(op) {
+            case 1: printf("\nDigite o número da partida: "); scanf("%d", &partida); system("clear"); readFile(filename, partida); break;
+            case 2: printf("Opção 2"); break;
+            case 0: exit(0);
+            default: printf("Opção [%d] inválida!!!\n", op);    
+        }
+    }
+}
+
+void readFile(char* filename, int partida) {
+    FILE* f;
+    Partida buffer;
+    int pos = partida-1, lin, col;
+
+    if ((f = fopen(filename, "rb")) == NULL) {
+        printf("ERRO ao abrir o arquivo!\n");
+        exit(0);
+    }
+    fseek(f, sizeof(Partida)*pos, SEEK_SET);
+    fread(&buffer, sizeof(Partida), 1, f);
+    printf("\nPartida = %d\n", buffer.partida);
+    printf("________________________\n\n");
+    printf("Tabuleiro\n\n");
+    for (lin = 0; lin < 3; lin++) {
+        for (col = 0; col < 3; col++)
+            col == 2 ? printf(" %c ", buffer.JogVelha[lin][col]) : printf(" %c |", buffer.JogVelha[lin][col]);
+        lin == 2 ? printf("\n\n") : printf("\n--- --- ---\n"); 
+    }
+    printf("________________________\n");
+    printf("\nGanhador: *- %c -*\n", buffer.resultado);
+    stop();
+    fclose(f);
+}
+
 void stop() {
+    setbuf(stdin, NULL);
     getchar();
     setbuf(stdin, NULL);
     system("clear");
