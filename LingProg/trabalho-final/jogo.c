@@ -133,7 +133,7 @@ void main() {
             }
             if (nova_partida()) {
                 while (TRUE) {
-                    printf("Novo nível?\n\n[3] Básico\n[4] Intermediário\n[5] Avançado\n\n   Opção: ");
+                    printf("\nNovo nível?\n\n[3] Básico\n[4] Intermediário\n[5] Avançado\n\n   Opção: ");
                     scanf("%d", &nivel);
                     if ((nivel >= 3) && (nivel <= 5)) break;
                     printf("\nOpção [%d] inválida!!! Tente novamente!\n\n", nivel);
